@@ -4,43 +4,60 @@ Bot de música para Discord basado en **discord.js v14** y **Lavalink v4**. Repr
 
 ## Requisitos
 
+- **Git**
 - **Node.js** 18+
-- **Java** 17+ (para Lavalink)
-- Un bot de Discord con token (https://discord.com/developers/applications)
+- **Java** 17+ (solo para ejecución local sin Docker)
+- **Docker** y **Docker Compose** (opcional, recomendado)
 
-## Estructura
+## Instalación
 
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/AlvaroAlcocer/Bot-Mus-Dc.git
+cd Bot-Mus-Dc
+
+# 2. Configurar variables de entorno
+cp App/.env.example App/.env
 ```
-App/          → Bot de Node.js (TypeScript)
-Server/       → Servidor de audio Lavalink (Java)
-```
 
-## Configuración
-
-### 1. Token de Discord
-
-Copia `App/.env.example` a `App/.env` y completa:
+Editar `App/.env` y completar el token de Discord:
 
 ```env
 DISCORD_TOKEN=tu_token_aqui
 LAVALINK_HOST=localhost
-LAVALINK_PORT=8080
+LAVALINK_PORT=2333
 LAVALINK_PASSWORD=youshallnotpass
 ```
 
-### 2. Lavalink (Servidor de audio)
+> El token se obtiene en https://discord.com/developers/applications → tu app → Bot → Reset Token
 
+## Cómo ejecutar
+
+### Opción 1 — Docker (recomendado)
+
+```bash
+docker compose up -d
+```
+
+Ver logs:
+```bash
+docker compose logs -f
+```
+
+Detener:
+```bash
+docker compose down
+```
+
+### Opción 2 — Local (sin Docker)
+
+**Terminal 1 — Lavalink:**
 ```bash
 cd Server
 java -jar Lavalink.jar
 ```
 
-Espera a que aparezca `"Started Launcher"`.
-
-### 3. Bot
-
-En otra terminal:
-
+**Terminal 2 — Bot:**
 ```bash
 cd App
 npm install
@@ -49,14 +66,47 @@ npm run dev
 
 ## Comandos
 
-| Comando   | Descripción                     |
-|-----------|---------------------------------|
-| `/play`   | Busca y reproduce una canción   |
-| `/skip`   | Salta a la siguiente canción    |
-| `/pause`  | Pausa la reproducción           |
-| `/resume` | Reanuda la reproducción         |
-| `/stop`   | Detiene y limpia la cola        |
-| `/queue`  | Muestra la cola de reproducción |
+| Comando   | Descripción                     | Opciones                     |
+|-----------|---------------------------------|------------------------------|
+| `/play`   | Busca y reproduce una canción   | `query` (texto o URL)        |
+| `/skip`   | Salta a la siguiente canción    | —                            |
+| `/pause`  | Pausa la reproducción           | —                            |
+| `/resume` | Reanuda la reproducción         | —                            |
+| `/stop`   | Detiene y limpia la cola        | —                            |
+| `/queue`  | Muestra la cola de reproducción | —                            |
+
+> `/play` acepta nombres, URLs de YouTube, URLs de SoundCloud y playlists de YouTube.
+
+## Estructura del proyecto
+
+```
+Bot-Mus-Dc/
+├── App/                  # Bot de Node.js (TypeScript)
+│   ├── src/
+│   │   ├── index.ts           # Punto de entrada
+│   │   ├── config.ts          # Config desde .env
+│   │   ├── lavalink/
+│   │   │   └── manager.ts     # Conexión con Lavalink
+│   │   ├── events/
+│   │   │   ├── ready.ts       # Evento al iniciar sesión
+│   │   │   └── interactionCreate.ts  # Ruteo de comandos
+│   │   └── commands/
+│   │       ├── play.ts
+│   │       ├── skip.ts
+│   │       ├── pause.ts
+│   │       ├── resume.ts
+│   │       ├── stop.ts
+│   │       └── queue.ts
+│   ├── Dockerfile
+│   └── package.json
+├── Server/               # Servidor de audio Lavalink (Java)
+│   ├── Lavalink.jar
+│   ├── application.yml
+│   └── plugins/
+│       └── youtube-plugin-1.18.1.jar
+├── docker-compose.yml    # Orquestación Docker
+└── README.md
+```
 
 ## Producción
 

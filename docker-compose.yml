@@ -1,0 +1,23 @@
+services:
+  lavalink:
+    image: ghcr.io/lavalink-devs/lavalink:4
+    container_name: bot-mus-lavalink
+    restart: unless-stopped
+    ports:
+      - "2333:2333"
+    volumes:
+      - ./Server/application.yml:/opt/Lavalink/application.yml:ro
+      - ./Server/plugins:/opt/Lavalink/plugins
+
+  bot:
+    build:
+      context: ./App
+    container_name: bot-mus-discord
+    restart: unless-stopped
+    depends_on:
+      - lavalink
+    env_file:
+      - ./App/.env
+    environment:
+      - LAVALINK_HOST=lavalink
+      - LAVALINK_PORT=2333
